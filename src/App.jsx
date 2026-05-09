@@ -16,6 +16,8 @@ import Events from "./components/Events";
 import Projects from "./components/Projects";
 import Contact from "./components/Contact";
 import Footer from "./components/Footer";
+import DeveloperConsole from "./components/DeveloperConsole";
+import MatrixRain from "./components/MatrixRain";
 import { SpiralDemo } from "./components/ui/demo";
 import FlowArt, { FlowSection } from "./components/ui/story-scroll";
 import ScrollToTop from "./components/ScrollToTop";
@@ -23,6 +25,7 @@ import ScrollToTop from "./components/ScrollToTop";
 function App() {
   const [showSplash, setShowSplash] = useState(true);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [isMatrixActive, setIsMatrixActive] = useState(false);
 
   const handleEnter = () => {
     setIsTransitioning(true);
@@ -32,8 +35,16 @@ function App() {
     }, 1000);
   };
 
+  const toggleMatrix = () => {
+    const nextState = !isMatrixActive;
+    setIsMatrixActive(nextState);
+    return nextState;
+  };
+
   return (
     <>
+      {/* ── Matrix Rain Canvas Background ── */}
+      <MatrixRain isActive={isMatrixActive} />
       {/* ── Splash screen ── */}
       {showSplash && (
         <div
@@ -129,6 +140,9 @@ function App() {
           </FlowSection>
 
         </FlowArt>
+
+        {/* ── Interactive Developer Terminal Console ── */}
+        <DeveloperConsole onToggleMatrix={toggleMatrix} />
       </div>
     </>
   );
