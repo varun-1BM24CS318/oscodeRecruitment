@@ -92,7 +92,7 @@ const MatrixRain = ({ isActive }) => {
       ref={canvasRef}
       className="fixed inset-0 pointer-events-none transition-opacity duration-1000"
       style={{
-        zIndex: 5,
+        zIndex: 40,
         opacity: isActive ? 0.35 : 0,
       }}
     />
