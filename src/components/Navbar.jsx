@@ -153,15 +153,3 @@ const Navbar = ({ theme, toggleTheme }) => {
 };
 
 export default Navbar;
-k={(e) => handleNavClick(e, "#contact")}>
-              Join Club
-            </Button>
-          </li>
-        </ul>
-      </div>
-    </nav>
-  );
-};
-
-export default Navbar;
-ort default Navbar;

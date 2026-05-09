@@ -46,10 +46,4 @@ const SpiralDemo = ({ onEnter }: { onEnter: () => void }) => {
   )
 }
 
-export {SpiralDemo}
->
-    </div>
-  )
-}
-
-export {SpiralDemo}
+export { SpiralDemo }
