@@ -17,7 +17,7 @@ const COMMANDS = {
   clear: "Clear the terminal logs",
 };
 
-const DeveloperConsole = ({ onToggleMatrix }) => {
+const DeveloperConsole = ({ isMatrixActive, onToggleMatrix }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isMaximized, setIsMaximized] = useState(false);
   const [history, setHistory] = useState([
@@ -126,10 +126,11 @@ Seniors verdict: "MUST RECRUIT IMMEDIATELY! Elevates the entire frontend team."
 
       case "matrix":
         if (onToggleMatrix) {
-          const enabled = onToggleMatrix();
+          onToggleMatrix();
+          const nextState = !isMatrixActive;
           newLogs.push({
             type: "output",
-            text: enabled 
+            text: nextState 
               ? "MATRIX RAIN EFFECT: ACTIVE. Welcome to the source code." 
               : "MATRIX RAIN EFFECT: OFFLINE. Returning to standard interface."
           });

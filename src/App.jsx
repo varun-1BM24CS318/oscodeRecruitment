@@ -36,9 +36,7 @@ function App() {
   };
 
   const toggleMatrix = () => {
-    const nextState = !isMatrixActive;
-    setIsMatrixActive(nextState);
-    return nextState;
+    setIsMatrixActive((prev) => !prev);
   };
 
   return (
@@ -142,7 +140,7 @@ function App() {
         </FlowArt>
 
         {/* ── Interactive Developer Terminal Console ── */}
-        <DeveloperConsole onToggleMatrix={toggleMatrix} />
+        <DeveloperConsole isMatrixActive={isMatrixActive} onToggleMatrix={toggleMatrix} />
       </div>
     </>
   );
