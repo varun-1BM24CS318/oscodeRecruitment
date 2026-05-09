@@ -135,6 +135,8 @@ function App() {
             id="team"
             aria-label="Our Team"
             showDivider={true}
+            pinSpacing={true}
+            interactiveDuration="150%"
             style={{ backgroundColor: "#0a0a0f", color: "#ffffff" }}
           >
             <Team />

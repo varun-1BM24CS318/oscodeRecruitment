@@ -5,9 +5,14 @@
 
 import { useState, useEffect, useRef } from "react";
 import { motion } from "motion/react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useGSAP } from "@gsap/react";
 import useScrollAnimation from "../hooks/useScrollAnimation";
 import TextScramble from "./ui/TextScramble";
 import { CircularGallery } from "./ui/circular-gallery";
+
+gsap.registerPlugin(ScrollTrigger);
 
 /* ─── team data ─── */
 const teamGalleryItems = [
@@ -124,11 +129,9 @@ const Team = () => {
   const targetRotRef = useRef(0);
   const currentRotRef = useRef(0);
   const [rotation, setRotation] = useState(0);
-
   const consumedRef  = useRef(0);
-  const wheelingRef  = useRef(false);
-  const wheelTimerRef = useRef(null);
   const isDragging   = useRef(false);
+  const isScrolling  = useRef(false);
 
   const [progress, setProgress] = useState(0);
   
@@ -150,7 +153,8 @@ const Team = () => {
   useEffect(() => {
     let raf;
     const tick = () => {
-      if (!wheelingRef.current && !isDragging.current) {
+      // Auto-rotate only when not manually interacting
+      if (!isScrolling.current && !isDragging.current) {
         targetRotRef.current += AUTO_SPEED;
       }
       
@@ -169,70 +173,33 @@ const Team = () => {
   }, [rotation]);
 
   /* Hover-based wheel trap */
-  useEffect(() => {
-    const handleWheel = (e) => {
-      const section = sectionRef.current;
-      if (!section) return;
-      
-      const rect = section.getBoundingClientRect();
-      const delta = e.deltaY;
-
-      // Check if Team section is dominating the viewport
-      const isActive = rect.top <= 100 && rect.bottom >= window.innerHeight - 100;
-      if (!isActive) return;
-
-      const eventsSection = document.getElementById("events");
-      if (eventsSection) {
-        const eventsRect = eventsSection.getBoundingClientRect();
-        
-        // If Events is covering more than 30% of the viewport, bail out completely
-        if (eventsRect.top < window.innerHeight * 0.7) return;
-
-        // If Events is partially visible and user is scrolling UP, let native scroll push it down
-        if (delta < 0 && eventsRect.top < window.innerHeight - 2) return;
-      }
-
-      if (delta > 0) {
-        /* scrolling DOWN */
-        if (consumedRef.current < FULL_CYCLE) {
-          e.preventDefault(); // TRAP SCROLL!
-          const add = Math.min(delta * SENSITIVITY, FULL_CYCLE - consumedRef.current);
-          consumedRef.current += add;
-          targetRotRef.current += add; // Update target for smooth lerp
-          setProgress(Math.min(consumedRef.current / FULL_CYCLE, 1));
-        }
-      } else {
-        /* scrolling UP */
-        if (consumedRef.current > 0) {
-          e.preventDefault(); // TRAP SCROLL!
-          const sub = Math.min(Math.abs(delta) * SENSITIVITY, consumedRef.current);
-          consumedRef.current -= sub;
-          if (consumedRef.current < 0) consumedRef.current = 0;
-          targetRotRef.current -= sub; // Update target for smooth lerp
-          setProgress(Math.max(consumedRef.current / FULL_CYCLE, 0));
-        }
-      }
-
-      wheelingRef.current = true;
-      clearTimeout(wheelTimerRef.current);
-      wheelTimerRef.current = setTimeout(() => {
-        wheelingRef.current = false;
-      }, 200);
-    };
-
-    const sectionEl = sectionRef.current;
-    if (sectionEl) {
-      // Attach to the ENTIRE section, not just the gallery container, so the trap is inescapable!
-      sectionEl.addEventListener("wheel", handleWheel, { passive: false });
-    }
+  /* Link rotation to scroll progress using native ScrollTrigger */
+  useGSAP(() => {
+    if (!sectionRef.current) return;
     
-    return () => {
-      if (sectionEl) {
-        sectionEl.removeEventListener("wheel", handleWheel);
+    // Find the pin-spacer that FlowArt created, or use the section itself
+    const trigger = sectionRef.current.closest('.pin-spacer') || sectionRef.current;
+    
+    ScrollTrigger.create({
+      trigger: trigger,
+      start: "top top",
+      end: "bottom bottom",
+      scrub: true,
+      onToggle: (self) => {
+        isScrolling.current = self.isActive;
+      },
+      onUpdate: (self) => {
+        // Map 0-1 progress to 0-360 degrees
+        const newManualRot = self.progress * FULL_CYCLE;
+        // We update the target rotation by the delta of manual rotation
+        const delta = newManualRot - (targetRotRef.current - consumedRef.current);
+        targetRotRef.current += delta;
+        consumedRef.current = newManualRot;
+        setProgress(self.progress);
       }
-      clearTimeout(wheelTimerRef.current);
-    };
-  }, []);
+    });
+  }, { scope: sectionRef });
+
 
   /* Pan (Drag/Swipe) Handlers */
   const handlePanStart = () => {

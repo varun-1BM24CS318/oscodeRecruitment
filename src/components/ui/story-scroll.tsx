@@ -18,6 +18,8 @@ export interface FlowSectionProps {
   children: React.ReactNode;
   'aria-label'?: string;
   showDivider?: boolean;
+  pinSpacing?: boolean;
+  interactiveDuration?: string;
 }
 
 export const FlowSection: React.FC<FlowSectionProps> = ({
@@ -34,6 +36,8 @@ export const FlowSection: React.FC<FlowSectionProps> = ({
     <section
       id={id}
       data-flow-section
+      data-pin-spacing={pinSpacing}
+      data-interactive-duration={interactiveDuration}
       aria-label={ariaLabel}
       className={cx('relative min-h-screen w-full overflow-hidden', className)}
     >
@@ -133,14 +137,17 @@ const FlowArt: React.FC<FlowArtProps> = ({
           if (tween.scrollTrigger) triggers.push(tween.scrollTrigger);
         }
 
-        if (i < sections.length - 1) {
+        const pinSpacing = section.getAttribute('data-pin-spacing') === 'true';
+        const interactiveDuration = section.getAttribute('data-interactive-duration') || 'bottom top';
+
+        if (i < sections.length - 1 || pinSpacing) {
           triggers.push(
             ScrollTrigger.create({
               trigger: section,
               start: 'bottom bottom',
-              end: 'bottom top',
+              end: pinSpacing ? `+=${interactiveDuration}` : 'bottom top',
               pin: true,
-              pinSpacing: false,
+              pinSpacing: pinSpacing,
             }),
           );
         }
