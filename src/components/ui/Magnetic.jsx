@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from "react";
+import { useRef, useEffect } from "react";
 import { gsap } from "gsap";
 
 const Magnetic = ({ children, strength = 0.5 }) => {

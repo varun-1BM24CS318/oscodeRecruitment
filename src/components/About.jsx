@@ -6,6 +6,8 @@
 
 import { useEffect, useState } from "react";
 import useScrollAnimation from "../hooks/useScrollAnimation";
+import TextScramble from "./ui/TextScramble";
+import { MagicText } from "./ui/magic-text";
 
 /**
  * CountUp — animates a number from 0 to `target` once `active` is true.
@@ -84,10 +86,9 @@ const About = () => {
         <div className="about__grid">
           {/* Left: Text content */}
           <div ref={textRef} className={`about__text fade-left ${textVisible ? "fade-left--visible" : ""}`}>
-            <p className="about__lead">
-              OSCode Club was founded in 2021 by a group of engineering students who believed that
-              the best way to learn software development is by building things that matter — together.
-            </p>
+            <div className="mb-6 -mt-4 text-accent-blue">
+              <MagicText text="OSCode Club was founded in 2021 by a group of engineering students who believed that the best way to learn software development is by building things that matter — together." />
+            </div>
             <p className="about__body">
               We run workshops, hackathons, speaker sessions, and open-source sprints throughout the year.
               Our members have gone on to contribute to major projects like Linux, VS Code, and React, and

@@ -1,104 +1,231 @@
 /**
  * Team.jsx
- * Grid of glassmorphism team member cards with avatar initials, role, and social links.
- * Cards animate in on scroll using useScrollAnimation.
+ * 3D circular gallery with sticky scroll-driven rotation.
+ *
+ * Uses `position: sticky` to keep the gallery on-screen while scrolling down a 300vh section.
+ * - Auto-rotates slowly when idle.
+ * - Page scrolling adds momentum to the rotation seamlessly.
+ * - Solves the "gap" and "wheel trap" issues entirely.
  */
 
-import { teamMembers } from "../data/team";
+import { useState, useEffect, useRef } from "react";
+import { useScroll, useMotionValueEvent } from "motion/react";
 import useScrollAnimation from "../hooks/useScrollAnimation";
+import TextScramble from "./ui/TextScramble";
+import { CircularGallery } from "./ui/circular-gallery";
 
-/**
- * GitHub SVG Icon
- */
-const GitHubIcon = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-    <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
-  </svg>
-);
+/* ─── team data mapped to GalleryItem shape ─── */
+const teamGalleryItems = [
+  {
+    common: "Arjun Sharma",
+    binomial: "Club President · Full Stack Dev",
+    github: "https://github.com",
+    linkedin: "https://linkedin.com",
+    photo: {
+      url: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&auto=format&fit=crop&q=80",
+      text: "Final year CSE student passionate about open source and distributed systems.",
+      pos: "center top",
+      by: "Arjun Sharma",
+    },
+  },
+  {
+    common: "Priya Nair",
+    binomial: "Vice President · UI/UX Lead",
+    github: "https://github.com",
+    linkedin: "https://linkedin.com",
+    photo: {
+      url: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=600&auto=format&fit=crop&q=80",
+      text: "Crafting beautiful and accessible user experiences using React and Figma.",
+      pos: "center top",
+      by: "Priya Nair",
+    },
+  },
+  {
+    common: "Rohan Verma",
+    binomial: "Backend Lead",
+    github: "https://github.com",
+    linkedin: "https://linkedin.com",
+    photo: {
+      url: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=600&auto=format&fit=crop&q=80",
+      text: "Node.js & Go enthusiast. Loves building scalable APIs and microservices.",
+      pos: "center top",
+      by: "Rohan Verma",
+    },
+  },
+  {
+    common: "Sneha Iyer",
+    binomial: "AI / ML Lead",
+    github: "https://github.com",
+    linkedin: "https://linkedin.com",
+    photo: {
+      url: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=600&auto=format&fit=crop&q=80",
+      text: "Exploring the intersection of deep learning and real-world problem solving.",
+      pos: "center top",
+      by: "Sneha Iyer",
+    },
+  },
+  {
+    common: "Kiran Patel",
+    binomial: "DevOps · Cloud Engineer",
+    github: "https://github.com",
+    linkedin: "https://linkedin.com",
+    photo: {
+      url: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=600&auto=format&fit=crop&q=80",
+      text: "Kubernetes, Docker, AWS — automating everything so developers can ship faster.",
+      pos: "center top",
+      by: "Kiran Patel",
+    },
+  },
+  {
+    common: "Ananya Reddy",
+    binomial: "Open Source Coordinator",
+    github: "https://github.com",
+    linkedin: "https://linkedin.com",
+    photo: {
+      url: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600&auto=format&fit=crop&q=80",
+      text: "Managing contributions across 10+ OSS projects and mentoring new contributors.",
+      pos: "center top",
+      by: "Ananya Reddy",
+    },
+  },
+  {
+    common: "Vikram Singh",
+    binomial: "Mobile Development Lead",
+    github: "https://github.com",
+    linkedin: "https://linkedin.com",
+    photo: {
+      url: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=600&auto=format&fit=crop&q=80",
+      text: "Flutter & React Native developer. Ships cross-platform apps that feel native.",
+      pos: "center top",
+      by: "Vikram Singh",
+    },
+  },
+  {
+    common: "Divya Menon",
+    binomial: "Events · Community Manager",
+    github: "https://github.com",
+    linkedin: "https://linkedin.com",
+    photo: {
+      url: "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=600&auto=format&fit=crop&q=80",
+      text: "Organising hackathons, talks and workshops to bring the community together.",
+      pos: "center top",
+      by: "Divya Menon",
+    },
+  },
+];
 
-/**
- * LinkedIn SVG Icon
- */
-const LinkedInIcon = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
-  </svg>
-);
-
-/**
- * Single team member card
- */
-const TeamCard = ({ member, index }) => {
-  const [ref, isVisible] = useScrollAnimation({ threshold: 0.1 });
-
-  return (
-    <div
-      ref={ref}
-      className={`glass-card team-card fade-up ${isVisible ? "fade-up--visible" : ""}`}
-      style={{ transitionDelay: `${index * 0.08}s` }}
-    >
-      {/* Avatar */}
-      <div className="team-card__avatar" style={{ background: `${member.color}22`, border: `2px solid ${member.color}55` }}>
-        <span className="team-card__initials" style={{ color: member.color }}>
-          {member.initials}
-        </span>
-        <div className="team-card__avatar-glow" style={{ background: member.color }}></div>
-      </div>
-
-      {/* Info */}
-      <div className="team-card__info">
-        <h3 className="team-card__name">{member.name}</h3>
-        <p className="team-card__role">{member.role}</p>
-        <p className="team-card__bio">{member.bio}</p>
-      </div>
-
-      {/* Social links */}
-      <div className="team-card__socials">
-        <a
-          href={member.github}
-          className="team-card__social-link"
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label={`${member.name}'s GitHub`}
-        >
-          <GitHubIcon />
-        </a>
-        <a
-          href={member.linkedin}
-          className="team-card__social-link team-card__social-link--linkedin"
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label={`${member.name}'s LinkedIn`}
-        >
-          <LinkedInIcon />
-        </a>
-      </div>
-    </div>
-  );
-};
+const ITEMS          = teamGalleryItems.length;
+const DEG_PER_ITEM   = 360 / ITEMS;
+const AUTO_SPEED     = 0.012; 
 
 const Team = () => {
   const [headerRef, headerVisible] = useScrollAnimation();
+  const sectionRef   = useRef(null);
+
+  const rotRef       = useRef(0);
+  const [rotation, setRotation] = useState(0);
+
+  // Use framer-motion to track scroll progress over the 300vh section
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start start", "end end"]
+  });
+
+  const prevScrollRef = useRef(0);
+
+  useMotionValueEvent(scrollYProgress, "change", (latest) => {
+    const delta = latest - prevScrollRef.current;
+    prevScrollRef.current = latest;
+    // Spin 720 degrees (2 full rotations) over the entire 300vh scroll
+    rotRef.current += delta * 720;
+    setRotation(rotRef.current);
+  });
+
+  /* Auto-rotate constantly when idle */
+  useEffect(() => {
+    let raf;
+    const tick = () => {
+      rotRef.current += AUTO_SPEED;
+      setRotation(rotRef.current);
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, []);
+
+  /* which member is currently front-and-centre */
+  const frontIndex =
+    (ITEMS - Math.round((rotation % 360) / DEG_PER_ITEM) % ITEMS) % ITEMS;
 
   return (
-    <section className="team section" aria-label="Team section">
-      <div className="container">
-        {/* Section header */}
-        <div ref={headerRef} className={`section__header fade-up ${headerVisible ? "fade-up--visible" : ""}`}>
-          <span className="section__tag">The People</span>
-          <h2 className="section__title">
-            <TextScramble text="Meet the Team" autostart={headerVisible} />
-          </h2>
-          <p className="section__subtitle">
-            Passionate developers, designers, and builders who make OSCode what it is.
-          </p>
-        </div>
+    <section
+      ref={sectionRef}
+      className="team relative w-full"
+      aria-label="Team section"
+      style={{ height: "300vh" }}
+    >
+      {/* Sticky container stays perfectly fixed to the viewport while scrolling the 300vh */}
+      <div className="sticky top-0 w-full h-screen flex flex-col overflow-hidden py-24">
+        <div className="container flex flex-col flex-1 h-full relative z-10">
+          
+          {/* Section header */}
+          <div
+            ref={headerRef}
+            className={`section__header fade-up ${headerVisible ? "fade-up--visible" : ""}`}
+          >
+            <span className="section__tag">The People</span>
+            <h2 className="section__title">
+              <TextScramble text="Meet the Team" autostart={headerVisible} />
+            </h2>
+            <p className="section__subtitle">
+              Passionate developers, designers, and builders who make OSCode what it is.
+            </p>
+          </div>
 
-        {/* Team grid */}
-        <div className="team__grid">
-          {teamMembers.map((member, index) => (
-            <TeamCard key={member.id} member={member} index={index} />
-          ))}
+          {/* ── 3D Circular Gallery ── */}
+          <div className="relative flex-1 w-full" style={{ height: "450px", minHeight: "450px" }}>
+            <CircularGallery
+              items={teamGalleryItems}
+              rotation={rotation}
+              radius={480}
+              className="w-full h-full"
+            />
+          </div>
+
+          {/* ── Progress bar + hint ── */}
+          <div className="mt-4 px-8 pb-4">
+            {/* progress track */}
+            <div className="relative w-full h-[2px] bg-white/10 rounded-full overflow-hidden">
+              <div
+                className="absolute left-0 top-0 h-full bg-white/50 rounded-full"
+                style={{ width: `${Math.max(0, Math.min(100, scrollYProgress.get() * 100))}%` }}
+              />
+            </div>
+
+            {/* member dots */}
+            <div className="flex justify-between mt-3">
+              {teamGalleryItems.map((m, i) => (
+                <div
+                  key={m.common}
+                  className="flex flex-col items-center gap-1"
+                >
+                  <div
+                    className="w-1.5 h-1.5 rounded-full transition-all duration-300"
+                    style={{
+                      background: i === frontIndex ? "#ffffff" : "rgba(255,255,255,0.2)",
+                      transform: i === frontIndex ? "scale(1.6)" : "scale(1)",
+                    }}
+                  />
+                </div>
+              ))}
+            </div>
+
+            {/* contextual hint */}
+            <p className="mt-3 text-center text-xs tracking-widest uppercase text-white/30">
+              Scroll down to rotate · Hover a card for links
+            </p>
+          </div>
+
         </div>
       </div>
     </section>

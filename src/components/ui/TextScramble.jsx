@@ -1,20 +1,66 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 
 const CHARS = "!<>-_\\/[]{}—=+*^?#________";
 
-const TextScramble = ({ text, delay = 0, duration = 1.5, autostart = true }) => {
+const TextScramble = ({ text, delay = 0, duration = 0.5, autostart = true }) => {
   const [displayText, setDisplayText] = useState("");
   const [isScrambling, setIsScrambling] = useState(false);
 
-  const scramble = useCallback(async () => {
+  useEffect(() => {
+    if (!autostart) return;
+
+    let isMounted = true;
+    let interval;
+    let timeout;
+
+    timeout = setTimeout(() => {
+      if (!isMounted) return;
+      setIsScrambling(true);
+
+      let iteration = 0;
+      const maxIterations = text.length;
+
+      interval = setInterval(() => {
+        if (!isMounted) return;
+
+        setDisplayText(
+          text
+            .split("")
+            .map((char, index) => {
+              if (index < iteration) {
+                return text[index];
+              }
+              return CHARS[Math.floor(Math.random() * CHARS.length)];
+            })
+            .join("")
+        );
+
+        iteration += 1 / (duration * 10);
+
+        if (iteration >= maxIterations) {
+          setDisplayText(text);
+          setIsScrambling(false);
+          clearInterval(interval);
+        }
+      }, 20);
+    }, delay * 1000);
+
+    return () => {
+      isMounted = false;
+      clearTimeout(timeout);
+      clearInterval(interval);
+    };
+  }, [text, delay, duration, autostart]);
+
+  const handleMouseEnter = () => {
     if (isScrambling) return;
     setIsScrambling(true);
 
     let iteration = 0;
     const maxIterations = text.length;
-    
+
     const interval = setInterval(() => {
-      setDisplayText((prev) =>
+      setDisplayText(
         text
           .split("")
           .map((char, index) => {
@@ -26,31 +72,22 @@ const TextScramble = ({ text, delay = 0, duration = 1.5, autostart = true }) => 
           .join("")
       );
 
-      iteration += 1 / (duration * 10); // Adjust speed here
+      iteration += 1 / (duration * 10);
 
       if (iteration >= maxIterations) {
         setDisplayText(text);
-        clearInterval(interval);
         setIsScrambling(false);
+        clearInterval(interval);
       }
-    }, 30);
-
-    return () => clearInterval(interval);
-  }, [text, duration, isScrambling]);
-
-  useEffect(() => {
-    if (autostart) {
-      const timeout = setTimeout(scramble, delay * 1000);
-      return () => clearTimeout(timeout);
-    }
-  }, [autostart, delay, scramble]);
+    }, 20);
+  };
 
   return (
     <span 
       className="inline-block font-mono" 
-      onMouseEnter={() => !isScrambling && scramble()}
+      onMouseEnter={handleMouseEnter}
     >
-      {displayText || text.replace(/./g, " ")}
+      {displayText || text}
     </span>
   );
 };

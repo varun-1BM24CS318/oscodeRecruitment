@@ -9,7 +9,7 @@ import { useState, useEffect, useRef } from "react";
 const SIZE = 56; // button diameter px
 
 const ScrollToTop = () => {
-  const [progress, setProgress] = useState(0);
+  const [_progress, setProgress] = useState(0); // _progress tracked via progressRef; state setter kept for re-render sync
   const [visible, setVisible] = useState(false);
   const animRef = useRef(null);
   const waveOffsetRef = useRef(0);

@@ -28,10 +28,9 @@ const Footer = () => {
         <div className="footer__top">
           {/* Logo */}
           <div className="footer__brand">
-            <a href="#home" className="navbar__logo footer__logo" onClick={(e) => handleClick(e, "#home")} aria-label="Back to top">
-              <span className="navbar__logo-bracket">&lt;</span>
-              <span className="navbar__logo-text">OSCode</span>
-              <span className="navbar__logo-bracket">/&gt;</span>
+            <a href="#home" className="navbar__logo footer__logo" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }} onClick={(e) => handleClick(e, "#home")} aria-label="Back to top">
+              <img src="/logo.png" alt="OSCode Logo" className="w-8 h-8 rounded-full object-cover shadow-sm" />
+              <span className="navbar__logo-text" style={{ fontSize: '1.25rem' }}>OSCode</span>
             </a>
             <p className="footer__tagline">
               Open source coding club at BMSCE, Bengaluru.

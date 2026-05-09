@@ -5,7 +5,7 @@
  */
 
 import { useState, useEffect, useRef } from "react";
-import { Terminal, X, Minimize2, Maximize2, Sparkles, Flame } from "lucide-react";
+import { Terminal, X, Minimize2, Maximize2 } from "lucide-react";
 
 const COMMANDS = {
   help: "Show all available commands",
@@ -44,7 +44,7 @@ const playClickSound = () => {
 
     osc.start();
     osc.stop(ctx.currentTime + 0.03);
-  } catch (err) {}
+  } catch (_err) { /* audio API not available – silently ignored */ }
 };
 
 const playEnterSound = () => {
@@ -72,7 +72,7 @@ const playEnterSound = () => {
 
     osc.start();
     osc.stop(ctx.currentTime + 0.08);
-  } catch (err) {}
+  } catch (_err) { /* audio API not available – silently ignored */ }
 };
 
 const playBeepSound = () => {
@@ -95,7 +95,7 @@ const playBeepSound = () => {
 
     osc.start();
     osc.stop(ctx.currentTime + 0.2);
-  } catch (err) {}
+  } catch (_err) { /* audio API not available – silently ignored */ }
 };
 
 const DeveloperConsole = ({ isMatrixActive, onToggleMatrix }) => {
@@ -269,7 +269,7 @@ Seniors verdict: "MUST RECRUIT IMMEDIATELY! Elevates the entire frontend team."
           setIsOpen(!isOpen);
           playBeepSound();
         }}
-        className="fixed bottom-6 left-6 z-50 flex items-center gap-2 rounded-full border border-green-500/30 bg-black/80 px-4 py-3 font-mono text-xs text-green-400 shadow-lg shadow-green-500/10 backdrop-blur-md transition-all hover:scale-105 hover:border-green-400 hover:text-green-300 hover:shadow-green-500/20 active:scale-95"
+        className="fixed bottom-6 left-6 z-[9999] flex items-center gap-2 rounded-full border border-green-500/30 bg-black/80 px-4 py-3 font-mono text-xs text-green-400 shadow-lg shadow-green-500/10 backdrop-blur-md transition-all hover:scale-105 hover:border-green-400 hover:text-green-300 hover:shadow-green-500/20 active:scale-95"
         aria-label="Open Developer Console"
       >
         <Terminal className="h-4 w-4 animate-pulse text-green-400" />
@@ -284,9 +284,9 @@ Seniors verdict: "MUST RECRUIT IMMEDIATELY! Elevates the entire frontend team."
       {isOpen && (
         <div
           onClick={() => inputRef.current?.focus()}
-          className={`fixed bottom-24 left-6 z-50 flex flex-col rounded-lg border border-green-500/30 bg-black/90 font-mono text-green-400 shadow-2xl shadow-green-500/15 backdrop-blur-lg transition-all duration-300 ${
+          className={`fixed bottom-24 left-6 z-[9999] flex flex-col rounded-lg border border-green-500/30 bg-black/90 font-mono text-green-400 shadow-2xl shadow-green-500/15 backdrop-blur-lg transition-all duration-300 ${
             isMaximized
-              ? "fixed inset-6 bottom-24 z-50"
+              ? "fixed inset-6 bottom-24 z-[9999]"
               : "h-[380px] w-[90vw] sm:w-[480px]"
           }`}
           style={{

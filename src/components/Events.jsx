@@ -7,6 +7,7 @@
 import { events } from "../data/events";
 import useScrollAnimation from "../hooks/useScrollAnimation";
 import { Button } from "./ui/neon-button";
+import TextScramble from "./ui/TextScramble";
 
 const tagColors = {
   Hackathon: { bg: "#ffffff15", border: "#ffffff40", text: "#ffffff" },

@@ -21,23 +21,23 @@ import MatrixRain from "./components/MatrixRain";
 import { SpiralDemo } from "./components/ui/demo";
 import FlowArt, { FlowSection } from "./components/ui/story-scroll";
 import ScrollToTop from "./components/ScrollToTop";
-import CustomCursor from "./components/ui/CustomCursor";
-import ScrollProgress from "./components/ui/ScrollProgress";
 
 function App() {
   const [showSplash, setShowSplash] = useState(true);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [isMatrixActive, setIsMatrixActive] = useState(false);
-  const [theme, setTheme] = useState("dark"); // Default to dark as per original design
 
-  // Theme Management
+  // Lock body scroll while splash screen is active
   useEffect(() => {
-    document.documentElement.setAttribute("data-theme", theme);
-  }, [theme]);
-
-  const toggleTheme = () => {
-    setTheme((prev) => (prev === "dark" ? "light" : "dark"));
-  };
+    if (showSplash) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [showSplash]);
 
   // Dynamic Tab Title and Hacker Typing Cursor Effect
   useEffect(() => {
@@ -82,8 +82,6 @@ function App() {
 
   return (
     <>
-      <CustomCursor />
-      <ScrollProgress />
       {/* ── Matrix Rain Canvas Background ── */}
       <MatrixRain isActive={isMatrixActive} />
       {/* ── Splash screen ── */}
@@ -106,9 +104,6 @@ function App() {
         }`}
       >
         <Navbar />
-
-        {/* Scroll-to-top progress button */}
-        <ScrollToTop />
 
         {/* Hero: full-screen flow-field canvas, sits outside FlowArt */}
         <Hero />
@@ -182,9 +177,11 @@ function App() {
 
         </FlowArt>
 
-        {/* ── Interactive Developer Terminal Console ── */}
-        <DeveloperConsole isMatrixActive={isMatrixActive} onToggleMatrix={toggleMatrix} />
       </div>
+
+      {/* ── Fixed floating elements outside scroll-trigger containing blocks ── */}
+      <ScrollToTop />
+      <DeveloperConsole isMatrixActive={isMatrixActive} onToggleMatrix={toggleMatrix} />
     </>
   );
 }

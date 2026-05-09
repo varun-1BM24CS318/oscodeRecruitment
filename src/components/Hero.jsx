@@ -8,6 +8,7 @@
 import NeuralBackground from "./ui/flow-field-background";
 import { Button } from "./ui/neon-button";
 import { ArrowRight, GitBranch, Sparkles } from "lucide-react";
+import Magnetic from "./ui/Magnetic";
 
 const Hero = () => {
   const handleScroll = (href) => {

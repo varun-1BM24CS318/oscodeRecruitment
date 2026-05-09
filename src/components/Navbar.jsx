@@ -6,7 +6,6 @@
 import { useState, useEffect } from "react";
 import { Button } from "./ui/neon-button";
 import Magnetic from "./ui/Magnetic";
-import { Sun, Moon } from "lucide-react";
 
 const navLinks = [
   { label: "Home", href: "#home" },
@@ -17,7 +16,7 @@ const navLinks = [
   { label: "Contact", href: "#contact" },
 ];
 
-const Navbar = ({ theme, toggleTheme }) => {
+const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("home");
@@ -59,10 +58,9 @@ const Navbar = ({ theme, toggleTheme }) => {
     <nav className={`navbar ${scrolled ? "navbar--scrolled" : ""}`} role="navigation" aria-label="Main navigation">
       <div className="navbar__container">
         {/* Logo */}
-        <a href="#home" className="navbar__logo" onClick={(e) => handleNavClick(e, "#home")} aria-label="OSCode Club Home">
-          <span className="navbar__logo-bracket">&lt;</span>
-          <span className="navbar__logo-text">OSCode</span>
-          <span className="navbar__logo-bracket">/&gt;</span>
+        <a href="#home" className="navbar__logo" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }} onClick={(e) => handleNavClick(e, "#home")} aria-label="OSCode Club Home">
+          <img src="/logo.png" alt="OSCode Logo" className="w-8 h-8 rounded-full object-cover shadow-sm" />
+          <span className="navbar__logo-text" style={{ fontSize: '1.25rem' }}>OSCode</span>
         </a>
 
         {/* Desktop Nav Links */}
@@ -82,17 +80,6 @@ const Navbar = ({ theme, toggleTheme }) => {
 
         {/* CTA Button */}
         <div className="flex items-center gap-4">
-          <Magnetic strength={0.3}>
-            <button
-              onClick={toggleTheme}
-              className="p-2 rounded-full hover:bg-white/10 transition-colors"
-              style={{ color: "var(--text-primary)" }}
-              aria-label="Toggle Theme"
-            >
-              {theme === "dark" ? <Sun size={20} /> : <Moon size={20} />}
-            </button>
-          </Magnetic>
-
           <Magnetic strength={0.2}>
             <Button
               variant="solid"
@@ -136,16 +123,6 @@ const Navbar = ({ theme, toggleTheme }) => {
             <Button variant="solid" className="w-full navbar__mobile-cta mt-4" onClick={(e) => handleNavClick(e, "#contact")}>
               Join Club
             </Button>
-          </li>
-          <li className="mt-4">
-            <button
-              onClick={toggleTheme}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 border border-white/10"
-              style={{ color: "var(--text-primary)", borderColor: "var(--glass-border)" }}
-            >
-              {theme === "dark" ? <Sun size={20} /> : <Moon size={20} />}
-              <span>{theme === "dark" ? "Light Mode" : "Dark Mode"}</span>
-            </button>
           </li>
         </ul>
       </div>

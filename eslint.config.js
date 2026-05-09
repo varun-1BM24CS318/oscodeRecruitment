@@ -17,5 +17,11 @@ export default defineConfig([
       globals: globals.browser,
       parserOptions: { ecmaFeatures: { jsx: true } },
     },
+    rules: {
+      // Allow underscore-prefixed variables as intentionally unused (conventional pattern)
+      'no-unused-vars': ['error', { varsIgnorePattern: '^_', argsIgnorePattern: '^_', caughtErrorsIgnorePattern: '^_' }],
+      // Allow intentionally empty catch blocks
+      'no-empty': ['error', { allowEmptyCatch: true }],
+    },
   },
 ])

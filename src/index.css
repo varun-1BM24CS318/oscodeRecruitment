@@ -10,18 +10,18 @@
    1. CSS Variables & Reset
    ========================================================================== */
 :root {
-  /* Default (Light) Theme */
-  --bg-color: #ffffff;
-  --bg-secondary: #f9fafb;
-  --text-primary: #111827;
-  --text-secondary: #4b5563;
-  --accent-blue: #2563eb;
-  --accent-purple: #7c3aed;
-  
-  /* Glassmorphism - Light */
-  --glass-bg: rgba(0, 0, 0, 0.03);
-  --glass-border: rgba(0, 0, 0, 0.08);
-  --glass-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+  /* Fixed Dark Theme */
+  --bg-color: #000000;
+  --bg-secondary: #0a0a0f;
+  --text-primary: #ffffff;
+  --text-secondary: #a1a1aa;
+  --accent-blue: #e4e4e7;
+  --accent-purple: #ffffff;
+
+  /* Glassmorphism - Dark */
+  --glass-bg: rgba(255, 255, 255, 0.03);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
   --glass-blur: blur(10px);
 
   /* Gradients */
@@ -36,23 +36,7 @@
   --transition-fast: 0.2s ease;
   --transition-normal: 0.3s ease;
   --transition-slow: 0.5s ease;
-  
-  --theme-invert: 1;
-}
 
-[data-theme='dark'] {
-  --bg-color: #000000;
-  --bg-secondary: #0a0a0f;
-  --text-primary: #ffffff;
-  --text-secondary: #a1a1aa;
-  --accent-blue: #e4e4e7;
-  --accent-purple: #ffffff;
-
-  /* Glassmorphism - Dark */
-  --glass-bg: rgba(255, 255, 255, 0.03);
-  --glass-border: rgba(255, 255, 255, 0.08);
-  --glass-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
-  
   --theme-invert: 0;
 }
 
@@ -82,11 +66,7 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-@media (hover: hover) and (pointer: fine) {
-  body, a, button, input, textarea {
-    cursor: none !important;
-  }
-}
+
 
 a {
   color: inherit;

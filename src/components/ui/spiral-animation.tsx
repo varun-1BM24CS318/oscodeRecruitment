@@ -427,9 +427,9 @@ export function SpiralAnimation() {
         canvas.width = size * dpr
         canvas.height = size * dpr
         
-        // 设置CSS尺寸
-        canvas.style.width = `${dimensions.width}px`
-        canvas.style.height = `${dimensions.height}px`
+        // 设置CSS尺寸为正方形，防止拉伸和挤压变形
+        canvas.style.width = `${size}px`
+        canvas.style.height = `${size}px`
         
         // 缩放上下文以适应DPR
         ctx.scale(dpr, dpr)
@@ -447,10 +447,10 @@ export function SpiralAnimation() {
     }, [dimensions])
     
     return (
-        <div className="relative w-full h-full">
+        <div className="relative w-full h-full bg-black overflow-hidden">
             <canvas
                 ref={canvasRef}
-                className="absolute inset-0 w-full h-full"
+                className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
             />
         </div>
     )
