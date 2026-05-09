@@ -16,7 +16,7 @@ const navLinks = [
   { label: "Contact", href: "#contact" },
 ];
 
-const Navbar = () => {
+const Navbar = ({ theme, toggleTheme }) => {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("home");
@@ -80,13 +80,28 @@ const Navbar = () => {
         </ul>
 
         {/* CTA Button */}
-        <Button
-          variant="solid"
-          className="navbar__cta"
-          onClick={(e) => handleNavClick(e, "#contact")}
-        >
-          Join Club
-        </Button>
+        <div className="flex items-center gap-4">
+          <Magnetic strength={0.3}>
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-full hover:bg-white/10 transition-colors"
+              style={{ color: "var(--text-primary)" }}
+              aria-label="Toggle Theme"
+            >
+              {theme === "dark" ? <Sun size={20} /> : <Moon size={20} />}
+            </button>
+          </Magnetic>
+
+          <Magnetic strength={0.2}>
+            <Button
+              variant="solid"
+              className="navbar__cta"
+              onClick={(e) => handleNavClick(e, "#contact")}
+            >
+              Join Club
+            </Button>
+          </Magnetic>
+        </div>
 
         {/* Hamburger */}
         <button
@@ -121,6 +136,16 @@ const Navbar = () => {
               Join Club
             </Button>
           </li>
+          <li className="mt-4">
+            <button
+              onClick={toggleTheme}
+              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 border border-white/10"
+              style={{ color: "var(--text-primary)", borderColor: "var(--glass-border)" }}
+            >
+              {theme === "dark" ? <Sun size={20} /> : <Moon size={20} />}
+              <span>{theme === "dark" ? "Light Mode" : "Dark Mode"}</span>
+            </button>
+          </li>
         </ul>
       </div>
     </nav>
@@ -139,3 +164,4 @@ k={(e) => handleNavClick(e, "#contact")}>
 };
 
 export default Navbar;
+ort default Navbar;

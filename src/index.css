@@ -10,22 +10,23 @@
    1. CSS Variables & Reset
    ========================================================================== */
 :root {
-  /* Colors */
-  --bg-color: #000000;
-  --text-primary: #ffffff;
-  --text-secondary: #a1a1aa;
-  --accent-blue: #e4e4e7;
-  --accent-purple: #ffffff;
+  /* Default (Light) Theme */
+  --bg-color: #ffffff;
+  --bg-secondary: #f9fafb;
+  --text-primary: #111827;
+  --text-secondary: #4b5563;
+  --accent-blue: #2563eb;
+  --accent-purple: #7c3aed;
+  
+  /* Glassmorphism - Light */
+  --glass-bg: rgba(0, 0, 0, 0.03);
+  --glass-border: rgba(0, 0, 0, 0.08);
+  --glass-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+  --glass-blur: blur(10px);
 
   /* Gradients */
   --gradient-primary: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-purple) 100%);
   --gradient-text: linear-gradient(to right, var(--text-primary), var(--text-secondary));
-
-  /* Glassmorphism */
-  --glass-bg: rgba(255, 255, 255, 0.03);
-  --glass-border: rgba(255, 255, 255, 0.08);
-  --glass-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-  --glass-blur: blur(10px);
 
   /* Typography */
   --font-heading: 'Space Grotesk', sans-serif;
@@ -35,6 +36,24 @@
   --transition-fast: 0.2s ease;
   --transition-normal: 0.3s ease;
   --transition-slow: 0.5s ease;
+  
+  --theme-invert: 1;
+}
+
+[data-theme='dark'] {
+  --bg-color: #000000;
+  --bg-secondary: #0a0a0f;
+  --text-primary: #ffffff;
+  --text-secondary: #a1a1aa;
+  --accent-blue: #e4e4e7;
+  --accent-purple: #ffffff;
+
+  /* Glassmorphism - Dark */
+  --glass-bg: rgba(255, 255, 255, 0.03);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+  
+  --theme-invert: 0;
 }
 
 *, *::before, *::after {
@@ -121,8 +140,9 @@ h1, h2, h3, h4, h5, h6 {
 .section__tag {
   display: inline-block;
   padding: 0.25rem 1rem;
-  background: rgba(255, 255, 255, 0.1);
-  color: #ffffff;
+  background: var(--glass-bg);
+  color: var(--text-primary);
+  border: 1px solid var(--glass-border);
   border-radius: 999px;
   font-size: 0.875rem;
   font-weight: 500;
@@ -134,7 +154,7 @@ h1, h2, h3, h4, h5, h6 {
 .section__title {
   font-size: clamp(2rem, 4vw, 3rem);
   margin-bottom: 1rem;
-  background: linear-gradient(to right, #fff, #94a3b8);
+  background: linear-gradient(to right, var(--text-primary), var(--text-secondary));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }

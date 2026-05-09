@@ -28,6 +28,16 @@ function App() {
   const [showSplash, setShowSplash] = useState(true);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [isMatrixActive, setIsMatrixActive] = useState(false);
+  const [theme, setTheme] = useState("dark"); // Default to dark as per original design
+
+  // Theme Management
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme((prev) => (prev === "dark" ? "light" : "dark"));
+  };
 
   // Dynamic Tab Title and Hacker Typing Cursor Effect
   useEffect(() => {

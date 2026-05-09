@@ -131,16 +131,17 @@ const ScrollToTop = () => {
         transform: visible ? "scale(1)" : "scale(0.6)",
         transition: "opacity 0.4s ease, transform 0.4s ease",
         pointerEvents: visible ? "auto" : "none",
-        boxShadow: "0 0 0 2px rgba(255,255,255,0.2), 0 4px 24px rgba(0,0,0,0.5)",
+        boxShadow: "0 0 0 2px var(--glass-border), 0 4px 24px rgba(0,0,0,0.2)",
       }}
     >
-      {/* Black base */}
+      {/* Dynamic base */}
       <div
         style={{
           position: "absolute",
           inset: 0,
           borderRadius: "50%",
-          background: "#000",
+          background: "var(--bg-color)",
+          border: "1px solid var(--glass-border)",
         }}
       />
 
@@ -153,10 +154,11 @@ const ScrollToTop = () => {
           width: "100%",
           height: "100%",
           borderRadius: "50%",
+          filter: "invert(var(--theme-invert, 0))", // We can use this to invert the white wave if needed
         }}
       />
 
-      {/* Arrow — colour flips based on fill level for readability */}
+      {/* Arrow — color flips based on fill level for readability */}
       <svg
         width="18"
         height="18"
@@ -169,9 +171,9 @@ const ScrollToTop = () => {
         style={{
           position: "relative",
           zIndex: 1,
-          stroke: progress > 0.55 ? "#000" : "#fff",
+          stroke: "var(--text-primary)",
+          mixBlendMode: "difference", // This makes it readable on any background
           transition: "stroke 0.3s ease",
-          mixBlendMode: "normal",
         }}
       >
         <path d="M12 19V5M5 12l7-7 7 7" />

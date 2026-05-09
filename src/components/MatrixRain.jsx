@@ -41,7 +41,8 @@ const MatrixRain = ({ isActive }) => {
 
     const draw = () => {
       // Clear slightly with opacity to create trail/fade effect
-      ctx.fillStyle = "rgba(0, 0, 0, 0.08)";
+      const bgColor = getComputedStyle(document.documentElement).getPropertyValue('--bg-color').trim();
+      ctx.fillStyle = bgColor === '#ffffff' ? "rgba(255, 255, 255, 0.1)" : "rgba(0, 0, 0, 0.08)";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       ctx.fillStyle = "#0f0"; // Bright green rain
