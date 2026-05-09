@@ -2,6 +2,7 @@
 
 import { SpiralAnimation } from "./spiral-animation"
 import { useState, useEffect } from 'react'
+import Magnetic from "./Magnetic"
 
 const SpiralDemo = ({ onEnter }: { onEnter: () => void }) => {
   const [startVisible, setStartVisible] = useState(false)
@@ -41,6 +42,12 @@ const SpiralDemo = ({ onEnter }: { onEnter: () => void }) => {
           Enter
         </button>
       </div>
+    </div>
+  )
+}
+
+export {SpiralDemo}
+>
     </div>
   )
 }

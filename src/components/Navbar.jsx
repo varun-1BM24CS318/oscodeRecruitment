@@ -5,6 +5,7 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "./ui/neon-button";
+import Magnetic from "./ui/Magnetic";
 
 const navLinks = [
   { label: "Home", href: "#home" },
@@ -117,6 +118,17 @@ const Navbar = () => {
           ))}
           <li>
             <Button variant="solid" className="w-full navbar__mobile-cta mt-4" onClick={(e) => handleNavClick(e, "#contact")}>
+              Join Club
+            </Button>
+          </li>
+        </ul>
+      </div>
+    </nav>
+  );
+};
+
+export default Navbar;
+k={(e) => handleNavClick(e, "#contact")}>
               Join Club
             </Button>
           </li>

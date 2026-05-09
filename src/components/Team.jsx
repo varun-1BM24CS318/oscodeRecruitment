@@ -86,7 +86,9 @@ const Team = () => {
         {/* Section header */}
         <div ref={headerRef} className={`section__header fade-up ${headerVisible ? "fade-up--visible" : ""}`}>
           <span className="section__tag">The People</span>
-          <h2 className="section__title">Meet the Team</h2>
+          <h2 className="section__title">
+            <TextScramble text="Meet the Team" autostart={headerVisible} />
+          </h2>
           <p className="section__subtitle">
             Passionate developers, designers, and builders who make OSCode what it is.
           </p>

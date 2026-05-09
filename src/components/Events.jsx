@@ -95,7 +95,9 @@ const Events = () => {
         {/* Header */}
         <div ref={headerRef} className={`section__header fade-up ${headerVisible ? "fade-up--visible" : ""}`}>
           <span className="section__tag">Community</span>
-          <h2 className="section__title">Events & Activities</h2>
+          <h2 className="section__title">
+            <TextScramble text="Events & Activities" autostart={headerVisible} />
+          </h2>
           <p className="section__subtitle">
             Hackathons, workshops, and talks — always something to look forward to.
           </p>

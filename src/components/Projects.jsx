@@ -8,6 +8,7 @@ import { useState } from "react";
 import { projects } from "../data/projects";
 import useScrollAnimation from "../hooks/useScrollAnimation";
 import { Button } from "./ui/neon-button";
+import TextScramble from "./ui/TextScramble";
 
 const filters = ["All", "Web", "AI", "Tools"];
 
@@ -134,5 +135,8 @@ const Projects = () => {
     </section>
   );
 };
+
+export default Projects;
+;
 
 export default Projects;

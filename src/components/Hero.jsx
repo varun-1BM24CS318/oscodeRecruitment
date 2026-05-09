@@ -89,27 +89,31 @@ const Hero = () => {
 
         {/* CTA row */}
         <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
-          <Button
-            variant="solid"
-            size="lg"
-            onClick={() => handleScroll("#contact")}
-            id="hero-join-btn"
-            className="flex items-center gap-2 px-8"
-          >
-            Join Us
-            <ArrowRight size={16} />
-          </Button>
+          <Magnetic strength={0.3}>
+            <Button
+              variant="solid"
+              size="lg"
+              onClick={() => handleScroll("#contact")}
+              id="hero-join-btn"
+              className="flex items-center gap-2 px-8"
+            >
+              Join Us
+              <ArrowRight size={16} />
+            </Button>
+          </Magnetic>
 
-          <Button
-            variant="ghost"
-            size="lg"
-            onClick={() => handleScroll("#projects")}
-            id="hero-projects-btn"
-            className="flex items-center gap-2"
-          >
-            <GitBranch size={16} />
-            View Projects
-          </Button>
+          <Magnetic strength={0.3}>
+            <Button
+              variant="ghost"
+              size="lg"
+              onClick={() => handleScroll("#projects")}
+              id="hero-projects-btn"
+              className="flex items-center gap-2"
+            >
+              <GitBranch size={16} />
+              View Projects
+            </Button>
+          </Magnetic>
         </div>
 
         {/* Stats strip */}

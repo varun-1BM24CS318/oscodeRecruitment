@@ -21,6 +21,8 @@ import MatrixRain from "./components/MatrixRain";
 import { SpiralDemo } from "./components/ui/demo";
 import FlowArt, { FlowSection } from "./components/ui/story-scroll";
 import ScrollToTop from "./components/ScrollToTop";
+import CustomCursor from "./components/ui/CustomCursor";
+import ScrollProgress from "./components/ui/ScrollProgress";
 
 function App() {
   const [showSplash, setShowSplash] = useState(true);
@@ -70,6 +72,8 @@ function App() {
 
   return (
     <>
+      <CustomCursor />
+      <ScrollProgress />
       {/* ── Matrix Rain Canvas Background ── */}
       <MatrixRain isActive={isMatrixActive} />
       {/* ── Splash screen ── */}

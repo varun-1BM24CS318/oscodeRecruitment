@@ -73,7 +73,9 @@ const About = () => {
         {/* Section header */}
         <div ref={sectionRef} className={`section__header fade-up ${sectionVisible ? "fade-up--visible" : ""}`}>
           <span className="section__tag">Who We Are</span>
-          <h2 className="section__title">About OSCode Club</h2>
+          <h2 className="section__title">
+            <TextScramble text="About OSCode Club" autostart={sectionVisible} />
+          </h2>
           <p className="section__subtitle">
             A community of builders, thinkers, and collaborators — united by a love for open source.
           </p>
