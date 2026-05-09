@@ -14,6 +14,7 @@ import About from "./components/About";
 import Team from "./components/Team";
 import Events from "./components/Events";
 import Projects from "./components/Projects";
+import TechStack from "./components/TechStack";
 import Contact from "./components/Contact";
 import Footer from "./components/Footer";
 import DeveloperConsole from "./components/DeveloperConsole";
@@ -164,12 +165,27 @@ function App() {
             <Projects />
           </FlowSection>
 
+          {/* ── Tech Stack ── */}
+          <FlowSection
+            id="tech-stack"
+            aria-label="Tech Stack"
+            showDivider={true}
+            style={{
+              backgroundColor: "#0d1117",
+              color: "#ffffff",
+              backgroundImage: "radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px)",
+              backgroundSize: "24px 24px"
+            }}
+          >
+            <TechStack />
+          </FlowSection>
+
           {/* ── Contact ── */}
           <FlowSection
             id="contact"
             aria-label="Contact Us"
             showDivider={true}
-            style={{ backgroundColor: "#0d1117", color: "#ffffff" }}
+            style={{ backgroundColor: "#0a0a0f", color: "#ffffff" }}
           >
             <Contact />
             <Footer />

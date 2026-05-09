@@ -5,6 +5,7 @@
  */
 
 import { useEffect, useState } from "react";
+import { LockOpen, Users, Rocket } from "lucide-react";
 import useScrollAnimation from "../hooks/useScrollAnimation";
 import TextScramble from "./ui/TextScramble";
 import { MagicText } from "./ui/magic-text";
@@ -49,17 +50,17 @@ const stats = [
 
 const values = [
   {
-    icon: "🔓",
+    icon: <LockOpen size={32} className="text-accent-blue" />,
     title: "Open by Default",
     desc: "Everything we build is open source. We believe in transparency, collaboration, and giving back.",
   },
   {
-    icon: "🤝",
+    icon: <Users size={32} className="text-accent-blue" />,
     title: "Community First",
     desc: "From first-year beginners to final-year experts — everyone has a place and a voice at OSCode.",
   },
   {
-    icon: "🚀",
+    icon: <Rocket size={32} className="text-accent-blue" />,
     title: "Ship Real Things",
     desc: "We don't just learn — we build products used by thousands of real users in our campus and beyond.",
   },
