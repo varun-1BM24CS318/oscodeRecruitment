@@ -120,7 +120,9 @@ const Team = () => {
   const sectionRef   = useRef(null);
   const galleryContainerRef = useRef(null);
 
-  const rotRef       = useRef(0);
+  // Smooth lerping refs
+  const targetRotRef = useRef(0);
+  const currentRotRef = useRef(0);
   const [rotation, setRotation] = useState(0);
 
   const consumedRef  = useRef(0);
@@ -129,30 +131,42 @@ const Team = () => {
   const isDragging   = useRef(false);
 
   const [progress, setProgress] = useState(0);
+  
+  // Responsive layout state
   const [isMobile, setIsMobile] = useState(false);
+  const [windowHeight, setWindowHeight] = useState(1000);
 
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth < 768);
+      setWindowHeight(window.innerHeight);
     };
     handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  /* Auto-rotate when user not interacting */
+  /* Auto-rotate and Buttery Smooth Lerping */
   useEffect(() => {
     let raf;
     const tick = () => {
       if (!wheelingRef.current && !isDragging.current) {
-        rotRef.current += AUTO_SPEED;
-        setRotation(rotRef.current);
+        targetRotRef.current += AUTO_SPEED;
       }
+      
+      // LERP (Linear Interpolation) for buttery smooth motion
+      currentRotRef.current += (targetRotRef.current - currentRotRef.current) * 0.08;
+      
+      // Only update React state if the visual change is noticeable to save renders
+      if (Math.abs(currentRotRef.current - rotation) > 0.1) {
+        setRotation(currentRotRef.current);
+      }
+      
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, []);
+  }, [rotation]);
 
   /* Hover-based wheel trap */
   useEffect(() => {
@@ -163,12 +177,20 @@ const Team = () => {
       const rect = section.getBoundingClientRect();
       const delta = e.deltaY;
 
-      // Trap scroll only if section is fully visible (bottom is in viewport).
-      // This prevents trapping when cards are still half-cut-off.
       const isPinned = rect.bottom <= window.innerHeight + 10 && rect.top <= 80;
-
       if (!isPinned) {
         return; // Let the page scroll natively
+      }
+
+      // 🚨 CRITICAL FIX for the "Overlay" bug: 🚨
+      // If the next section (Events) is actively sliding up and covering this section,
+      // DO NOT trap the scroll. Let the user scroll normally to clear the overlay!
+      const eventsSection = document.getElementById("events");
+      if (eventsSection) {
+        const eventsRect = eventsSection.getBoundingClientRect();
+        if (eventsRect.top < window.innerHeight - 10) {
+          return; // The overlay is sliding up! Do not trap!
+        }
       }
 
       if (delta > 0) {
@@ -176,9 +198,8 @@ const Team = () => {
         if (consumedRef.current < FULL_CYCLE) {
           e.preventDefault(); // Trap scroll!
           const add = Math.min(delta * SENSITIVITY, FULL_CYCLE - consumedRef.current);
-          consumedRef.current += delta * SENSITIVITY;
-          rotRef.current += add;
-          setRotation(rotRef.current);
+          consumedRef.current += add;
+          targetRotRef.current += add; // Update target for smooth lerp
           setProgress(Math.min(consumedRef.current / FULL_CYCLE, 1));
         }
       } else {
@@ -186,10 +207,9 @@ const Team = () => {
         if (consumedRef.current > 0) {
           e.preventDefault(); // Trap scroll!
           const sub = Math.min(Math.abs(delta) * SENSITIVITY, consumedRef.current);
-          consumedRef.current -= Math.abs(delta) * SENSITIVITY;
+          consumedRef.current -= sub;
           if (consumedRef.current < 0) consumedRef.current = 0;
-          rotRef.current -= sub;
-          setRotation(rotRef.current);
+          targetRotRef.current -= sub; // Update target for smooth lerp
           setProgress(Math.max(consumedRef.current / FULL_CYCLE, 0));
         }
       }
@@ -220,8 +240,7 @@ const Team = () => {
   };
 
   const handlePan = (event, info) => {
-    rotRef.current -= info.delta.x * 0.4;
-    setRotation(rotRef.current);
+    targetRotRef.current -= info.delta.x * 0.4;
   };
 
   const handlePanEnd = () => {
@@ -229,7 +248,12 @@ const Team = () => {
   };
 
   const frontIndex = (ITEMS - Math.round((rotation % 360) / DEG_PER_ITEM) % ITEMS) % ITEMS;
-  const radius = isMobile ? 220 : 480;
+  
+  // Responsive sizing math so cards NEVER overflow their flex container
+  const radius = isMobile ? 220 : 450;
+  const dynamicScale = isMobile 
+    ? Math.min(0.7, Math.max(0.4, (windowHeight - 250) / 450)) 
+    : Math.min(1, Math.max(0.45, (windowHeight - 350) / 450));
 
   return (
     <section
@@ -269,7 +293,8 @@ const Team = () => {
               items={teamGalleryItems}
               rotation={rotation}
               radius={radius}
-              className={`w-full h-full transform ${isMobile ? 'scale-[0.65]' : 'scale-[0.85] lg:scale-100'} transition-transform duration-500`}
+              className="w-full h-full transform transition-transform duration-100 ease-out"
+              style={{ transform: `scale(${dynamicScale})` }}
             />
           </motion.div>
         </div>
