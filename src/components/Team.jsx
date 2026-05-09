@@ -177,26 +177,28 @@ const Team = () => {
       const rect = section.getBoundingClientRect();
       const delta = e.deltaY;
 
-      const isPinned = rect.bottom <= window.innerHeight + 10 && rect.top <= 80;
-      if (!isPinned) {
+      // Check if Team section is the currently active pinned section.
+      // We give 50px leeway for any subpixel GSAP pinning offsets.
+      const isActive = Math.abs(rect.top) < 50;
+      if (!isActive) {
         return; // Let the page scroll natively
       }
 
-      // 🚨 CRITICAL FIX for the "Overlay" bug: 🚨
-      // If the next section (Events) is actively sliding up and covering this section,
-      // DO NOT trap the scroll. Let the user scroll normally to clear the overlay!
+      // Check if the NEXT section (Events) is actively sliding up and covering us.
+      // If Events is covering the screen, we MUST NOT trap the scroll, so the user can push it back down.
       const eventsSection = document.getElementById("events");
       if (eventsSection) {
         const eventsRect = eventsSection.getBoundingClientRect();
-        if (eventsRect.top < window.innerHeight - 10) {
-          return; // The overlay is sliding up! Do not trap!
+        // If Events is more than 5px inside the viewport, let native scroll handle it.
+        if (eventsRect.top < window.innerHeight - 5) {
+          return; 
         }
       }
 
       if (delta > 0) {
         /* scrolling DOWN */
         if (consumedRef.current < FULL_CYCLE) {
-          e.preventDefault(); // Trap scroll!
+          e.preventDefault(); // TRAP SCROLL!
           const add = Math.min(delta * SENSITIVITY, FULL_CYCLE - consumedRef.current);
           consumedRef.current += add;
           targetRotRef.current += add; // Update target for smooth lerp
@@ -205,7 +207,7 @@ const Team = () => {
       } else {
         /* scrolling UP */
         if (consumedRef.current > 0) {
-          e.preventDefault(); // Trap scroll!
+          e.preventDefault(); // TRAP SCROLL!
           const sub = Math.min(Math.abs(delta) * SENSITIVITY, consumedRef.current);
           consumedRef.current -= sub;
           if (consumedRef.current < 0) consumedRef.current = 0;
@@ -221,14 +223,15 @@ const Team = () => {
       }, 200);
     };
 
-    const galleryEl = galleryContainerRef.current;
-    if (galleryEl) {
-      galleryEl.addEventListener("wheel", handleWheel, { passive: false });
+    const sectionEl = sectionRef.current;
+    if (sectionEl) {
+      // Attach to the ENTIRE section, not just the gallery container, so the trap is inescapable!
+      sectionEl.addEventListener("wheel", handleWheel, { passive: false });
     }
     
     return () => {
-      if (galleryEl) {
-        galleryEl.removeEventListener("wheel", handleWheel);
+      if (sectionEl) {
+        sectionEl.removeEventListener("wheel", handleWheel);
       }
       clearTimeout(wheelTimerRef.current);
     };
