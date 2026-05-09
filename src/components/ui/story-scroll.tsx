@@ -5,7 +5,7 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
 
-gsap.registerPlugin(ScrollTrigger, useGSAP);
+gsap.registerPlugin(ScrollTrigger);
 
 function cx(...parts: Array<string | undefined | false | null>): string {
   return parts.filter(Boolean).join(' ');
@@ -29,6 +29,8 @@ export const FlowSection: React.FC<FlowSectionProps> = ({
   children,
   'aria-label': ariaLabel,
   showDivider = false,
+  pinSpacing = false,
+  interactiveDuration = 'bottom top',
 }) => {
   const sectionRef = useRef<HTMLDivElement>(null);
 
