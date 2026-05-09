@@ -29,24 +29,6 @@ export const FlowSection: React.FC<FlowSectionProps> = ({
   showDivider = false,
 }) => {
   const sectionRef = useRef<HTMLDivElement>(null);
-  const [isVisible, setIsVisible] = useState(false);
-
-  useEffect(() => {
-    const el = sectionRef.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-        }
-      },
-      { threshold: 0.1 }
-    );
-    observer.observe(el);
-    return () => {
-      observer.unobserve(el);
-    };
-  }, []);
 
   return (
     <section
@@ -64,12 +46,7 @@ export const FlowSection: React.FC<FlowSectionProps> = ({
         )}
         style={{ transformOrigin: 'top center', ...style }}
       >
-        <div
-          className={cx(
-            'relative flex flex-1 flex-col justify-between w-full h-full transition-all duration-[600ms] ease-out',
-            isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-[30px]',
-          )}
-        >
+        <div className="relative flex flex-1 flex-col justify-between w-full h-full">
           {showDivider && (
             <div
               style={{

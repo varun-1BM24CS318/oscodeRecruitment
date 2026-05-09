@@ -177,22 +177,19 @@ const Team = () => {
       const rect = section.getBoundingClientRect();
       const delta = e.deltaY;
 
-      // Check if Team section is the currently active pinned section.
-      // We give 50px leeway for any subpixel GSAP pinning offsets.
-      const isActive = Math.abs(rect.top) < 50;
-      if (!isActive) {
-        return; // Let the page scroll natively
-      }
+      // Check if Team section is dominating the viewport
+      const isActive = rect.top <= 100 && rect.bottom >= window.innerHeight - 100;
+      if (!isActive) return;
 
-      // Check if the NEXT section (Events) is actively sliding up and covering us.
-      // If Events is covering the screen, we MUST NOT trap the scroll, so the user can push it back down.
       const eventsSection = document.getElementById("events");
       if (eventsSection) {
         const eventsRect = eventsSection.getBoundingClientRect();
-        // If Events is more than 5px inside the viewport, let native scroll handle it.
-        if (eventsRect.top < window.innerHeight - 5) {
-          return; 
-        }
+        
+        // If Events is covering more than 30% of the viewport, bail out completely
+        if (eventsRect.top < window.innerHeight * 0.7) return;
+
+        // If Events is partially visible and user is scrolling UP, let native scroll push it down
+        if (delta < 0 && eventsRect.top < window.innerHeight - 2) return;
       }
 
       if (delta > 0) {
