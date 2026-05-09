@@ -1,20 +1,17 @@
 /**
  * Team.jsx
- * 3D circular gallery with sticky scroll-driven rotation.
+ * 3D circular gallery with hover-based scroll-trapping.
  *
- * Uses `position: sticky` to keep the gallery on-screen while scrolling down a 300vh section.
- * - Auto-rotates slowly when idle.
- * - Page scrolling adds momentum to the rotation seamlessly.
- * - Solves the "gap" and "wheel trap" issues entirely.
+ * - Traps scroll only when hovering the gallery AND the section is perfectly at the top of the viewport.
+ * - This prevents the "blank gap" issue by allowing the page to natively scroll into position before trapping.
  */
 
 import { useState, useEffect, useRef } from "react";
-import { useScroll, useMotionValueEvent } from "motion/react";
 import useScrollAnimation from "../hooks/useScrollAnimation";
 import TextScramble from "./ui/TextScramble";
 import { CircularGallery } from "./ui/circular-gallery";
 
-/* ─── team data mapped to GalleryItem shape ─── */
+/* ─── team data ─── */
 const teamGalleryItems = [
   {
     common: "Arjun Sharma",
@@ -116,117 +113,167 @@ const teamGalleryItems = [
 
 const ITEMS          = teamGalleryItems.length;
 const DEG_PER_ITEM   = 360 / ITEMS;
-const AUTO_SPEED     = 0.012; 
+const AUTO_SPEED     = 0.012;
+const SENSITIVITY    = 0.25;
+const FULL_CYCLE     = 360;
 
 const Team = () => {
   const [headerRef, headerVisible] = useScrollAnimation();
   const sectionRef   = useRef(null);
+  const galleryContainerRef = useRef(null);
 
   const rotRef       = useRef(0);
   const [rotation, setRotation] = useState(0);
 
-  // Use framer-motion to track scroll progress over the 300vh section
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start start", "end end"]
-  });
+  const consumedRef  = useRef(0);
+  const wheelingRef  = useRef(false);
+  const wheelTimerRef = useRef(null);
 
-  const prevScrollRef = useRef(0);
+  const [progress, setProgress] = useState(0);
 
-  useMotionValueEvent(scrollYProgress, "change", (latest) => {
-    const delta = latest - prevScrollRef.current;
-    prevScrollRef.current = latest;
-    // Spin 720 degrees (2 full rotations) over the entire 300vh scroll
-    rotRef.current += delta * 720;
-    setRotation(rotRef.current);
-  });
-
-  /* Auto-rotate constantly when idle */
+  /* Auto-rotate when user not wheeling */
   useEffect(() => {
     let raf;
     const tick = () => {
-      rotRef.current += AUTO_SPEED;
-      setRotation(rotRef.current);
+      if (!wheelingRef.current) {
+        rotRef.current += AUTO_SPEED;
+        setRotation(rotRef.current);
+      }
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
   }, []);
 
-  /* which member is currently front-and-centre */
-  const frontIndex =
-    (ITEMS - Math.round((rotation % 360) / DEG_PER_ITEM) % ITEMS) % ITEMS;
+  /* Hover-based wheel trap */
+  useEffect(() => {
+    const handleWheel = (e) => {
+      const section = sectionRef.current;
+      if (!section) return;
+      
+      const rect = section.getBoundingClientRect();
+      const delta = e.deltaY;
+
+      // CRITICAL FIX: Only trap the scroll if the section is perfectly aligned with the viewport top.
+      // This allows the page to natively scroll into position, eliminating the "blank gap".
+      // GSAP pins the section at rect.top === 0. We give a small 5px leeway.
+      if (Math.abs(rect.top) > 5) {
+        return; // Let the page scroll natively!
+      }
+
+      if (delta > 0) {
+        /* scrolling DOWN */
+        if (consumedRef.current < FULL_CYCLE) {
+          e.preventDefault(); // Trap scroll!
+          const add = Math.min(delta * SENSITIVITY, FULL_CYCLE - consumedRef.current);
+          consumedRef.current += delta * SENSITIVITY;
+          rotRef.current += add;
+          setRotation(rotRef.current);
+          setProgress(Math.min(consumedRef.current / FULL_CYCLE, 1));
+        }
+      } else {
+        /* scrolling UP */
+        if (consumedRef.current > 0) {
+          e.preventDefault(); // Trap scroll!
+          const sub = Math.min(Math.abs(delta) * SENSITIVITY, consumedRef.current);
+          consumedRef.current -= Math.abs(delta) * SENSITIVITY;
+          if (consumedRef.current < 0) consumedRef.current = 0;
+          rotRef.current -= sub;
+          setRotation(rotRef.current);
+          setProgress(Math.max(consumedRef.current / FULL_CYCLE, 0));
+        }
+      }
+
+      wheelingRef.current = true;
+      clearTimeout(wheelTimerRef.current);
+      wheelTimerRef.current = setTimeout(() => {
+        wheelingRef.current = false;
+      }, 200);
+    };
+
+    const galleryEl = galleryContainerRef.current;
+    if (galleryEl) {
+      galleryEl.addEventListener("wheel", handleWheel, { passive: false });
+    }
+    
+    return () => {
+      if (galleryEl) {
+        galleryEl.removeEventListener("wheel", handleWheel);
+      }
+      clearTimeout(wheelTimerRef.current);
+    };
+  }, []);
+
+  const frontIndex = (ITEMS - Math.round((rotation % 360) / DEG_PER_ITEM) % ITEMS) % ITEMS;
 
   return (
     <section
       ref={sectionRef}
-      className="team relative w-full"
+      className="team relative w-full h-screen flex flex-col pt-24 overflow-hidden"
       aria-label="Team section"
-      style={{ height: "300vh" }}
     >
-      {/* Sticky container stays perfectly fixed to the viewport while scrolling the 300vh */}
-      <div className="sticky top-0 w-full h-screen flex flex-col overflow-hidden py-24">
-        <div className="container flex flex-col flex-1 h-full relative z-10">
-          
-          {/* Section header */}
-          <div
-            ref={headerRef}
-            className={`section__header fade-up ${headerVisible ? "fade-up--visible" : ""}`}
-          >
-            <span className="section__tag">The People</span>
-            <h2 className="section__title">
-              <TextScramble text="Meet the Team" autostart={headerVisible} />
-            </h2>
-            <p className="section__subtitle">
-              Passionate developers, designers, and builders who make OSCode what it is.
-            </p>
-          </div>
+      <div className="container flex flex-col flex-1 h-full relative z-10">
+        
+        {/* Section header */}
+        <div
+          ref={headerRef}
+          className={`section__header fade-up ${headerVisible ? "fade-up--visible" : ""}`}
+        >
+          <span className="section__tag">The People</span>
+          <h2 className="section__title">
+            <TextScramble text="Meet the Team" autostart={headerVisible} />
+          </h2>
+          <p className="section__subtitle">
+            Passionate developers, designers, and builders who make OSCode what it is.
+          </p>
+        </div>
 
-          {/* ── 3D Circular Gallery ── */}
-          <div className="relative flex-1 w-full" style={{ height: "450px", minHeight: "450px" }}>
-            <CircularGallery
-              items={teamGalleryItems}
-              rotation={rotation}
-              radius={480}
-              className="w-full h-full"
+        {/* ── 3D Circular Gallery ── */}
+        <div 
+          ref={galleryContainerRef}
+          className="relative flex-1 w-full" 
+          style={{ height: "450px", minHeight: "450px" }}
+        >
+          <CircularGallery
+            items={teamGalleryItems}
+            rotation={rotation}
+            radius={480}
+            className="w-full h-full"
+          />
+        </div>
+
+        {/* ── Progress bar + hint ── */}
+        <div className="mt-4 px-8 pb-4">
+          <div className="relative w-full h-[2px] bg-white/10 rounded-full overflow-hidden">
+            <div
+              className="absolute left-0 top-0 h-full bg-white/50 rounded-full transition-all duration-100"
+              style={{ width: `${progress * 100}%` }}
             />
           </div>
 
-          {/* ── Progress bar + hint ── */}
-          <div className="mt-4 px-8 pb-4">
-            {/* progress track */}
-            <div className="relative w-full h-[2px] bg-white/10 rounded-full overflow-hidden">
-              <div
-                className="absolute left-0 top-0 h-full bg-white/50 rounded-full"
-                style={{ width: `${Math.max(0, Math.min(100, scrollYProgress.get() * 100))}%` }}
-              />
-            </div>
-
-            {/* member dots */}
-            <div className="flex justify-between mt-3">
-              {teamGalleryItems.map((m, i) => (
+          <div className="flex justify-between mt-3">
+            {teamGalleryItems.map((m, i) => (
+              <div key={m.common} className="flex flex-col items-center gap-1">
                 <div
-                  key={m.common}
-                  className="flex flex-col items-center gap-1"
-                >
-                  <div
-                    className="w-1.5 h-1.5 rounded-full transition-all duration-300"
-                    style={{
-                      background: i === frontIndex ? "#ffffff" : "rgba(255,255,255,0.2)",
-                      transform: i === frontIndex ? "scale(1.6)" : "scale(1)",
-                    }}
-                  />
-                </div>
-              ))}
-            </div>
-
-            {/* contextual hint */}
-            <p className="mt-3 text-center text-xs tracking-widest uppercase text-white/30">
-              Scroll down to rotate · Hover a card for links
-            </p>
+                  className="w-1.5 h-1.5 rounded-full transition-all duration-300"
+                  style={{
+                    background: i === frontIndex ? "#ffffff" : "rgba(255,255,255,0.2)",
+                    transform: i === frontIndex ? "scale(1.6)" : "scale(1)",
+                  }}
+                />
+              </div>
+            ))}
           </div>
 
+          <p className="mt-3 text-center text-xs tracking-widest uppercase transition-colors duration-300"
+            style={{ color: progress >= 1 ? "rgba(255,255,255,0.55)" : "rgba(255,255,255,0.28)" }}
+          >
+            {progress >= 1
+              ? "All members explored — scroll to continue ↓"
+              : "Hover cards to rotate gallery"}
+          </p>
         </div>
+
       </div>
     </section>
   );
