@@ -126,7 +126,7 @@ const CircularGallery = React.forwardRef<HTMLDivElement, CircularGalleryProps>(
 
                   {/* Hover border glow */}
                   <div
-                    className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                    className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
                     style={{
                       boxShadow: 'inset 0 0 40px rgba(255,255,255,0.05)',
                       border: '1px solid rgba(255,255,255,0.18)',
