@@ -62,7 +62,7 @@ export const FlowSection: React.FC<FlowSectionProps> = ({
           'flow-art-container relative flex min-h-screen w-full flex-col justify-between',
           'will-change-transform',
         )}
-        style={{ transformOrigin: 'bottom left', ...style }}
+        style={{ transformOrigin: 'top center', ...style }}
       >
         <div
           className={cx(
@@ -132,14 +132,24 @@ const FlowArt: React.FC<FlowArtProps> = ({
         if (!inner) return;
 
         if (i > 0) {
-          gsap.set(inner, { rotation: 30, transformOrigin: 'bottom left' });
+          // Centered cinematic 3D perspective depth reveal for perfect widescreen scaling
+          gsap.set(inner, { 
+            transformPerspective: 1200, 
+            rotationX: -12, // subtle backward tilt
+            scale: 0.88,    // elegant 3D scale down
+            opacity: 0.6,   // fade out slightly for depth layering
+            transformOrigin: 'top center' 
+          });
+
           const tween = gsap.to(inner, {
-            rotation: 0,
+            rotationX: 0,
+            scale: 1,
+            opacity: 1,
             ease: 'none',
             scrollTrigger: {
               trigger: section,
               start: 'top bottom',
-              end: 'top 25%',
+              end: 'top 20%',
               scrub: true,
             },
           });
