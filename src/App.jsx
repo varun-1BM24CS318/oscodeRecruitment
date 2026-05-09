@@ -7,7 +7,7 @@
  *   pinned-card "story scroll" reveal effect.
  */
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import About from "./components/About";
@@ -26,6 +26,35 @@ function App() {
   const [showSplash, setShowSplash] = useState(true);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [isMatrixActive, setIsMatrixActive] = useState(false);
+
+  // Dynamic Tab Title and Hacker Typing Cursor Effect
+  useEffect(() => {
+    let intervalId;
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        // Tab is inactive - type out an intriguing invitation
+        const message = "OSCode awaits you... 💻 ";
+        let index = 0;
+        intervalId = setInterval(() => {
+          document.title = message.substring(0, index + 1) + "▮";
+          index = (index + 1) % message.length;
+        }, 300);
+      } else {
+        // Tab is active - set standard high-fidelity title
+        clearInterval(intervalId);
+        document.title = "OSCode Club | Build. Collaborate. Innovate.";
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    // Initialize standard title
+    document.title = "OSCode Club | Build. Collaborate. Innovate.";
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      clearInterval(intervalId);
+    };
+  }, []);
 
   const handleEnter = () => {
     setIsTransitioning(true);

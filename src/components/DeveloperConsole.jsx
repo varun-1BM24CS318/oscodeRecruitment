@@ -17,6 +17,87 @@ const COMMANDS = {
   clear: "Clear the terminal logs",
 };
 
+// Web Audio API Synthesizers for immersive micro-interactions
+const playClickSound = () => {
+  try {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContext) return;
+    const ctx = new AudioContext();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    const filter = ctx.createBiquadFilter();
+
+    filter.type = "bandpass";
+    filter.frequency.value = 1100 + Math.random() * 500; // mechanical click pitch variation
+    filter.Q.value = 15;
+
+    osc.type = "triangle";
+    osc.frequency.setValueAtTime(800, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(100, ctx.currentTime + 0.03);
+
+    gain.gain.setValueAtTime(0.05, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.03);
+
+    osc.connect(filter);
+    filter.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start();
+    osc.stop(ctx.currentTime + 0.03);
+  } catch (err) {}
+};
+
+const playEnterSound = () => {
+  try {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContext) return;
+    const ctx = new AudioContext();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    const filter = ctx.createBiquadFilter();
+
+    filter.type = "lowpass";
+    filter.frequency.value = 500;
+
+    osc.type = "sawtooth";
+    osc.frequency.setValueAtTime(180, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(30, ctx.currentTime + 0.08);
+
+    gain.gain.setValueAtTime(0.07, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08);
+
+    osc.connect(filter);
+    filter.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start();
+    osc.stop(ctx.currentTime + 0.08);
+  } catch (err) {}
+};
+
+const playBeepSound = () => {
+  try {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContext) return;
+    const ctx = new AudioContext();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(987.77, ctx.currentTime); // B5 note
+    osc.frequency.setValueAtTime(1318.51, ctx.currentTime + 0.06); // E6 note (melodic chime)
+
+    gain.gain.setValueAtTime(0.02, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.2);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start();
+    osc.stop(ctx.currentTime + 0.2);
+  } catch (err) {}
+};
+
 const DeveloperConsole = ({ isMatrixActive, onToggleMatrix }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isMaximized, setIsMaximized] = useState(false);
@@ -158,6 +239,7 @@ Seniors verdict: "MUST RECRUIT IMMEDIATELY! Elevates the entire frontend team."
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
+      playEnterSound();
       handleCommand(inputVal);
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
@@ -183,7 +265,10 @@ Seniors verdict: "MUST RECRUIT IMMEDIATELY! Elevates the entire frontend team."
     <>
       {/* Floating Toggle Button */}
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => {
+          setIsOpen(!isOpen);
+          playBeepSound();
+        }}
         className="fixed bottom-6 left-6 z-50 flex items-center gap-2 rounded-full border border-green-500/30 bg-black/80 px-4 py-3 font-mono text-xs text-green-400 shadow-lg shadow-green-500/10 backdrop-blur-md transition-all hover:scale-105 hover:border-green-400 hover:text-green-300 hover:shadow-green-500/20 active:scale-95"
         aria-label="Open Developer Console"
       >
@@ -269,7 +354,10 @@ Seniors verdict: "MUST RECRUIT IMMEDIATELY! Elevates the entire frontend team."
               ref={inputRef}
               type="text"
               value={inputVal}
-              onChange={(e) => setInputVal(e.target.value)}
+              onChange={(e) => {
+                setInputVal(e.target.value);
+                playClickSound();
+              }}
               onKeyDown={handleKeyDown}
               placeholder="Type command here... Try 'help'"
               className="flex-1 bg-transparent text-xs text-green-300 placeholder-green-600 focus:outline-none"
