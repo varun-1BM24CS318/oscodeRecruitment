@@ -6,6 +6,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "./ui/neon-button";
 import Magnetic from "./ui/Magnetic";
+import { Sun, Moon } from "lucide-react";
 
 const navLinks = [
   { label: "Home", href: "#home" },
